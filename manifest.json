@@ -1,7 +1,7 @@
 {
   "name": "Visão de Águia – Bingo",
   "short_name": "Visão de Águia",
-  "description": "Fotografe seu papel com duas cartelas, leia os dois lados automaticamente, marque as pedras e detecte Bingo no modo Prime, X ou Cartela Cheia.",
+  "description": "Fotografe uma cartela por vez, leia os números, marque as pedras e detecte Bingo no modo Prime, X ou Cartela Cheia.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

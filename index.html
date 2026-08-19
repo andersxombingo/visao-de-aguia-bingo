@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#5b21b6" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Visão de Águia – Bingo — Leitura dupla v0.5</title>
+  <title>Visão de Águia – Bingo v0.6</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -15,7 +15,7 @@
 <body>
   <header class="topbar">
     <div>
-      <div class="eyebrow">MARCADOR DE CARTELAS</div>
+      <div class="eyebrow">MARCADOR DE CARTELAS · v0.6</div>
       <h1>Visão de Águia – Bingo</h1>
     </div>
     <button id="installBtn" class="ghost hidden" type="button">Instalar</button>
@@ -24,9 +24,9 @@
   <main class="app-shell">
     <section id="homeView" class="view active">
       <div class="hero card-panel">
-        <div class="hero-icon">📷</div>
-        <h2>Fotografe um papel por vez</h2>
-        <p>No seu modelo, cada papel tem 2 cartelas. O app separa esquerda e direita, lê os números, você confere e depois digita as pedras sorteadas. As marcações são automáticas.</p>
+        <div class="hero-icon">🦅</div>
+        <h2>Uma cartela por foto</h2>
+        <p>Para aumentar a precisão, fotografe somente uma grade 5×5 por vez. Depois o app lê os números, você confere e inicia o sorteio.</p>
         <button id="addCardBtn" class="primary big" type="button">Adicionar cartela</button>
       </div>
 
@@ -38,10 +38,7 @@
 
       <div class="card-panel mode-panel">
         <div class="section-title-row mode-title-row">
-          <div>
-            <div class="eyebrow">FORMA DE BATIDA</div>
-            <h3>Como vale o BINGO?</h3>
-          </div>
+          <div><div class="eyebrow">FORMA DE BATIDA</div><h3>Como vale o BINGO?</h3></div>
           <select id="winModeHome" class="mode-select" aria-label="Forma de batida">
             <option value="prime">Modo Prime</option>
             <option value="x">Modo X</option>
@@ -50,7 +47,7 @@
         </div>
         <label id="primeSquaresWrap" class="check-row prime-extra">
           <input id="primeSquaresHome" type="checkbox" />
-          <span><strong>Valer também quadradinhos dos cantos (4 números juntos)</strong><small>Cada quadradinho usa 2 colunas vizinhas e 2 linhas do canto. Vale B/I superior, G/O superior, B/I inferior ou G/O inferior.</small></span>
+          <span><strong>Valer também quadradinhos dos cantos (4 números juntos)</strong><small>Vale B/I superior, G/O superior, B/I inferior ou G/O inferior.</small></span>
         </label>
         <div id="primeSquaresGuide" class="corner-square-guide">
           <div><strong>B/I superior</strong><small>B1 + I1 + B2 + I2</small></div>
@@ -61,58 +58,58 @@
         <p id="modeHelp" class="hint mode-help"></p>
       </div>
 
-      <div class="section-title-row">
-        <h3>Cartelas salvas</h3>
-        <button id="startGameBtn" class="secondary" type="button" disabled>Iniciar sorteio</button>
-      </div>
+      <div class="section-title-row"><h3>Cartelas salvas</h3><button id="startGameBtn" class="secondary" type="button" disabled>Iniciar sorteio</button></div>
       <div id="cardsList" class="cards-list empty-state">Nenhuma cartela adicionada.</div>
     </section>
 
     <section id="captureView" class="view">
-      <div class="section-title-row">
-        <button class="back-btn" data-back-home type="button">← Voltar</button>
-        <h2>Adicionar cartela</h2>
+      <div class="section-title-row"><button class="back-btn" data-back-home type="button">← Voltar</button><h2>Adicionar cartela</h2></div>
+
+      <div id="captureStartPanel" class="card-panel">
+        <div class="capture-choice">
+          <button id="openCameraBtn" class="primary big" type="button">📷 Abrir câmera com guia</button>
+          <label class="camera-button secondary-camera">
+            <input id="photoInput" type="file" accept="image/*" capture="environment" />
+            <span>🖼️ Escolher / tirar foto normal</span>
+          </label>
+        </div>
+        <p class="hint"><strong>Importante:</strong> mesmo que o papel tenha duas cartelas, aproxime a câmera e fotografe <strong>somente uma grade de números 5×5</strong>. Não inclua o título BINGO nem a cartela ao lado.</p>
       </div>
 
-      <div class="card-panel">
-        <label class="form-label compact-label">Modelo da cartela
-          <select id="cardLayout" class="mode-select layout-select">
-            <option value="dual">Seu modelo: 2 cartelas no mesmo papel</option>
-            <option value="single">Uma grade 5×5 simples</option>
-          </select>
-        </label>
-        <label class="camera-button">
-          <input id="photoInput" type="file" accept="image/*" capture="environment" />
-          <span>📸 Tirar foto / escolher imagem</span>
-        </label>
-        <p class="hint"><strong>No seu modelo:</strong> fotografe o papel inteiro com as duas grades visíveis, reto, com boa luz e ocupando quase toda a imagem. O app separa automaticamente a cartela da esquerda e a da direita.</p>
+      <div id="liveCameraPanel" class="card-panel hidden">
+        <h3>Enquadre somente os números</h3>
+        <p class="hint">Coloque a grade 5×5 inteira dentro do quadro verde. Tente deixar o celular reto e sem sombra.</p>
+        <div class="live-camera-stage">
+          <video id="liveVideo" autoplay muted playsinline></video>
+          <div id="cameraGuide" class="camera-guide" aria-hidden="true">
+            <i class="v1"></i><i class="v2"></i><i class="v3"></i><i class="v4"></i>
+            <i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i>
+          </div>
+        </div>
+        <div class="camera-actions"><button id="closeCameraBtn" class="ghost" type="button">Cancelar</button><button id="capturePhotoBtn" class="primary big" type="button">Fotografar</button></div>
+        <div id="cameraError" class="error-text"></div>
       </div>
 
       <div id="cropPanel" class="card-panel hidden">
-        <h3 id="cropTitle">Ajustar o papel completo</h3>
-        <p id="cropHint" class="hint">Deixe dentro do retângulo amarelo o papel inteiro. As duas grades verdes devem ficar em cima dos números.</p>
+        <h3>Ajuste fino da grade 5×5</h3>
+        <p class="hint">O retângulo amarelo deve pegar <strong>somente os 25 quadrados dos números</strong>. Corte fora BINGO, bordas grossas e qualquer outra cartela.</p>
         <div class="canvas-wrap"><canvas id="previewCanvas"></canvas></div>
         <div class="crop-controls">
-          <label>Topo <input id="cropTop" type="range" min="0" max="35" value="8" /></label>
-          <label>Base <input id="cropBottom" type="range" min="0" max="35" value="5" /></label>
-          <label>Esquerda <input id="cropLeft" type="range" min="0" max="25" value="4" /></label>
-          <label>Direita <input id="cropRight" type="range" min="0" max="25" value="4" /></label>
+          <label>Topo <input id="cropTop" type="range" min="0" max="30" value="0" /></label>
+          <label>Base <input id="cropBottom" type="range" min="0" max="30" value="0" /></label>
+          <label>Esquerda <input id="cropLeft" type="range" min="0" max="30" value="0" /></label>
+          <label>Direita <input id="cropRight" type="range" min="0" max="30" value="0" /></label>
         </div>
         <label class="check-row"><input id="freeCenter" type="checkbox" checked /> Centro livre/coringa</label>
-        <button id="scanBtn" class="primary big" type="button">Ler números da cartela</button>
+        <button id="scanBtn" class="primary big" type="button">🔎 Ler números da cartela</button>
         <div id="ocrStatus" class="ocr-status hidden"></div>
       </div>
 
       <div id="reviewPanel" class="card-panel hidden">
-        <div class="section-title-row">
-          <div>
-            <h3>Confira os números</h3>
-            <p class="hint">Agora cada lado é conferido separadamente. Toque em qualquer número para corrigir.</p>
-          </div>
-        </div>
+        <div class="section-title-row"><div><h3>Confira os números</h3><p class="hint">Toque em qualquer célula para corrigir. O app só permite salvar quando B/I/N/G/O estiverem nas faixas corretas.</p></div></div>
         <p id="reviewSummary" class="review-summary"></p>
         <div id="reviewCards" class="review-cards"></div>
-        <button id="saveCardBtn" class="primary big" type="button">Salvar cartelas</button>
+        <button id="saveCardBtn" class="primary big" type="button">Salvar cartela</button>
       </div>
     </section>
 
@@ -122,40 +119,20 @@
         <div class="game-title"><span id="currentModeLabel">Modo Prime</span><strong id="lastNumber">—</strong></div>
         <button id="undoBtn" class="ghost" type="button" disabled>Desfazer</button>
       </div>
-
       <div class="draw-entry card-panel">
         <label for="drawInput">Digite a pedra sorteada</label>
-        <div class="draw-row">
-          <input id="drawInput" type="number" inputmode="numeric" min="1" max="75" placeholder="1–75" />
-          <button id="markBtn" class="primary" type="button">Marcar</button>
-        </div>
+        <div class="draw-row"><input id="drawInput" type="number" inputmode="numeric" min="1" max="75" placeholder="1–75" /><button id="markBtn" class="primary" type="button">Marcar</button></div>
         <div id="drawError" class="error-text"></div>
       </div>
-
-      <div class="section-title-row">
-        <h3>Mais próximas do bingo</h3>
-        <button id="resetGameBtn" class="danger-ghost" type="button">Zerar pedras</button>
-      </div>
+      <div class="section-title-row"><h3>Mais próximas do bingo</h3><button id="resetGameBtn" class="danger-ghost" type="button">Zerar pedras</button></div>
       <div id="gameCards" class="game-cards"></div>
-
-      <div class="card-panel compact">
-        <h3>Pedras sorteadas</h3>
-        <div id="drawnNumbers" class="drawn-numbers"></div>
-      </div>
+      <div class="card-panel compact"><h3>Pedras sorteadas</h3><div id="drawnNumbers" class="drawn-numbers"></div></div>
     </section>
   </main>
 
   <div id="bingoModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card bingo-modal-card">
-      <div class="confetti">🎉</div>
-      <div class="bingo-word">BINGO!</div>
-      <h2 id="bingoCardName">Cartela</h2>
-      <p id="bingoLineText">Linha completa</p>
-      <div id="bingoWinningGrid" class="bingo-grid winner-grid"></div>
-      <button id="closeBingoBtn" class="primary big" type="button">Continuar sorteio</button>
-    </div>
+    <div class="modal-card bingo-modal-card"><div class="confetti">🎉</div><div class="bingo-word">BINGO!</div><h2 id="bingoCardName">Cartela</h2><p id="bingoLineText">Linha completa</p><div id="bingoWinningGrid" class="bingo-grid winner-grid"></div><button id="closeBingoBtn" class="primary big" type="button">Continuar sorteio</button></div>
   </div>
-
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
