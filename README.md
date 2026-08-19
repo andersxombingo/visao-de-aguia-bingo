@@ -1,18 +1,21 @@
-# Visão de Águia – Bingo v0.6
+# Visão de Águia – Bingo v0.7 PRO
 
-Versão focada em precisão de leitura no celular.
+Versão otimizada para tábuas com **duas cartelas 5×5** no mesmo papel e **número de identificação central**.
 
-## Mudança principal
+## Destaques
+- câmera guiada para a tábua inteira;
+- duas áreas verdes posicionadas automaticamente pelo formato fixo;
+- autoajuste das bordas das duas grades após a foto;
+- tentativa de leitura do número de identificação da tábua;
+- duas cartelas salvas com o mesmo ID e indicação **Esquerda / Direita**;
+- BINGO mostra em destaque o ID da tábua e o lado vencedor;
+- painel de partida profissional com campo grande para pedra e botão MARCAR;
+- Menu separado para Prime, X, Cartela Cheia e adicional dos quadradinhos;
+- quadradinhos do Prime desligados por padrão e escondidos em configuração avançada;
+- preserva cartelas salvas nas versões anteriores.
 
-A leitura agora é feita com **uma cartela por foto**. A câmera guiada mostra uma grade 5×5 verde: enquadre somente os 25 quadrados dos números, sem o cabeçalho BINGO e sem a cartela vizinha. Isso evita que o OCR confunda duas cartelas do mesmo papel.
+## Modo Prime
+Horizontal, vertical, duas diagonais, quatro cantos e quatro formatos de V. Opcionalmente podem valer os quadradinhos B/I superior, G/O superior, B/I inferior e G/O inferior.
 
-- câmera guiada com recorte automático da grade;
-- ajuste fino depois da foto;
-- OCR por célula com pré-processamento adaptativo e tentativas alternativas;
-- falha em uma célula não derruba a leitura inteira;
-- validação automática das faixas B=1–15, I=16–30, N=31–45, G=46–60, O=61–75;
-- centro livre;
-- Modo Prime, X e Cartela Cheia;
-- adicional opcional dos 4 quadradinhos 2×2 dos cantos.
-
-Publicação: GitHub Pages / PWA.
+## Publicação
+Pronto para GitHub Pages. Suba os arquivos na raiz do repositório e mantenha `main / (root)` configurado em Pages.
