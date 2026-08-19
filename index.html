@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#5b21b6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Visão de Águia – Bingo — Prime, X e Cheia v0.4</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">MARCADOR DE CARTELAS</div>
+      <h1>Visão de Águia – Bingo</h1>
+    </div>
+    <button id="installBtn" class="ghost hidden" type="button">Instalar</button>
+  </header>
+
+  <main class="app-shell">
+    <section id="homeView" class="view active">
+      <div class="hero card-panel">
+        <div class="hero-icon">📷</div>
+        <h2>Fotografe uma cartela por vez</h2>
+        <p>O app lê os números, você confere e depois digita as pedras sorteadas. Escolha Modo Prime, X ou Cartela Cheia e as marcações são automáticas.</p>
+        <button id="addCardBtn" class="primary big" type="button">Adicionar cartela</button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card"><strong id="cardCount">0</strong><span>cartelas</span></div>
+        <div class="summary-card"><strong id="drawCount">0</strong><span>pedras</span></div>
+        <div class="summary-card"><strong id="nearCount">0</strong><span>faltando 1</span></div>
+      </div>
+
+      <div class="card-panel mode-panel">
+        <div class="section-title-row mode-title-row">
+          <div>
+            <div class="eyebrow">FORMA DE BATIDA</div>
+            <h3>Como vale o BINGO?</h3>
+          </div>
+          <select id="winModeHome" class="mode-select" aria-label="Forma de batida">
+            <option value="prime">Modo Prime</option>
+            <option value="x">Modo X</option>
+            <option value="full">Cartela cheia</option>
+          </select>
+        </div>
+        <label id="primeSquaresWrap" class="check-row prime-extra">
+          <input id="primeSquaresHome" type="checkbox" />
+          <span><strong>Valer também quadradinhos dos cantos (4 números juntos)</strong><small>Cada quadradinho usa 2 colunas vizinhas e 2 linhas do canto. Vale B/I superior, G/O superior, B/I inferior ou G/O inferior.</small></span>
+        </label>
+        <div id="primeSquaresGuide" class="corner-square-guide">
+          <div><strong>B/I superior</strong><small>B1 + I1 + B2 + I2</small></div>
+          <div><strong>G/O superior</strong><small>G1 + O1 + G2 + O2</small></div>
+          <div><strong>B/I inferior</strong><small>B4 + I4 + B5 + I5</small></div>
+          <div><strong>G/O inferior</strong><small>G4 + O4 + G5 + O5</small></div>
+        </div>
+        <p id="modeHelp" class="hint mode-help"></p>
+      </div>
+
+      <div class="section-title-row">
+        <h3>Cartelas salvas</h3>
+        <button id="startGameBtn" class="secondary" type="button" disabled>Iniciar sorteio</button>
+      </div>
+      <div id="cardsList" class="cards-list empty-state">Nenhuma cartela adicionada.</div>
+    </section>
+
+    <section id="captureView" class="view">
+      <div class="section-title-row">
+        <button class="back-btn" data-back-home type="button">← Voltar</button>
+        <h2>Adicionar cartela</h2>
+      </div>
+
+      <div class="card-panel">
+        <label class="camera-button">
+          <input id="photoInput" type="file" accept="image/*" capture="environment" />
+          <span>📸 Tirar foto / escolher imagem</span>
+        </label>
+        <p class="hint">Para melhor leitura, fotografe a cartela reta, com boa luz e ocupando quase toda a imagem.</p>
+      </div>
+
+      <div id="cropPanel" class="card-panel hidden">
+        <h3>Ajustar área da grade</h3>
+        <p class="hint">Deixe dentro do retângulo apenas a grade 5×5 com os números.</p>
+        <div class="canvas-wrap"><canvas id="previewCanvas"></canvas></div>
+        <div class="crop-controls">
+          <label>Topo <input id="cropTop" type="range" min="0" max="35" value="8" /></label>
+          <label>Base <input id="cropBottom" type="range" min="0" max="35" value="5" /></label>
+          <label>Esquerda <input id="cropLeft" type="range" min="0" max="25" value="4" /></label>
+          <label>Direita <input id="cropRight" type="range" min="0" max="25" value="4" /></label>
+        </div>
+        <label class="check-row"><input id="freeCenter" type="checkbox" checked /> Centro livre/coringa</label>
+        <button id="scanBtn" class="primary big" type="button">Ler números da cartela</button>
+        <div id="ocrStatus" class="ocr-status hidden"></div>
+      </div>
+
+      <div id="reviewPanel" class="card-panel hidden">
+        <div class="section-title-row">
+          <div>
+            <h3>Confira os números</h3>
+            <p class="hint">Toque em qualquer número para corrigir.</p>
+          </div>
+          <span id="validationBadge" class="badge">Verificando...</span>
+        </div>
+        <div id="reviewGrid" class="bingo-grid editor"></div>
+        <div id="validationMessages" class="validation-messages"></div>
+        <div class="form-row">
+          <label>Nome da cartela
+            <input id="cardName" type="text" maxlength="40" placeholder="Ex.: Cartela 1" />
+          </label>
+        </div>
+        <button id="saveCardBtn" class="primary big" type="button">Salvar cartela</button>
+      </div>
+    </section>
+
+    <section id="gameView" class="view">
+      <div class="game-head">
+        <button id="endGameBtn" class="back-btn" type="button">← Cartelas</button>
+        <div class="game-title"><span id="currentModeLabel">Modo Prime</span><strong id="lastNumber">—</strong></div>
+        <button id="undoBtn" class="ghost" type="button" disabled>Desfazer</button>
+      </div>
+
+      <div class="draw-entry card-panel">
+        <label for="drawInput">Digite a pedra sorteada</label>
+        <div class="draw-row">
+          <input id="drawInput" type="number" inputmode="numeric" min="1" max="75" placeholder="1–75" />
+          <button id="markBtn" class="primary" type="button">Marcar</button>
+        </div>
+        <div id="drawError" class="error-text"></div>
+      </div>
+
+      <div class="section-title-row">
+        <h3>Mais próximas do bingo</h3>
+        <button id="resetGameBtn" class="danger-ghost" type="button">Zerar pedras</button>
+      </div>
+      <div id="gameCards" class="game-cards"></div>
+
+      <div class="card-panel compact">
+        <h3>Pedras sorteadas</h3>
+        <div id="drawnNumbers" class="drawn-numbers"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="bingoModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card bingo-modal-card">
+      <div class="confetti">🎉</div>
+      <div class="bingo-word">BINGO!</div>
+      <h2 id="bingoCardName">Cartela</h2>
+      <p id="bingoLineText">Linha completa</p>
+      <div id="bingoWinningGrid" class="bingo-grid winner-grid"></div>
+      <button id="closeBingoBtn" class="primary big" type="button">Continuar sorteio</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
