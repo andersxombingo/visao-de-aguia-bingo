@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#5b21b6" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Visão de Águia – Bingo — Prime, X e Cheia v0.4</title>
+  <title>Visão de Águia – Bingo — Leitura dupla v0.5</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -25,8 +25,8 @@
     <section id="homeView" class="view active">
       <div class="hero card-panel">
         <div class="hero-icon">📷</div>
-        <h2>Fotografe uma cartela por vez</h2>
-        <p>O app lê os números, você confere e depois digita as pedras sorteadas. Escolha Modo Prime, X ou Cartela Cheia e as marcações são automáticas.</p>
+        <h2>Fotografe um papel por vez</h2>
+        <p>No seu modelo, cada papel tem 2 cartelas. O app separa esquerda e direita, lê os números, você confere e depois digita as pedras sorteadas. As marcações são automáticas.</p>
         <button id="addCardBtn" class="primary big" type="button">Adicionar cartela</button>
       </div>
 
@@ -75,16 +75,22 @@
       </div>
 
       <div class="card-panel">
+        <label class="form-label compact-label">Modelo da cartela
+          <select id="cardLayout" class="mode-select layout-select">
+            <option value="dual">Seu modelo: 2 cartelas no mesmo papel</option>
+            <option value="single">Uma grade 5×5 simples</option>
+          </select>
+        </label>
         <label class="camera-button">
           <input id="photoInput" type="file" accept="image/*" capture="environment" />
           <span>📸 Tirar foto / escolher imagem</span>
         </label>
-        <p class="hint">Para melhor leitura, fotografe a cartela reta, com boa luz e ocupando quase toda a imagem.</p>
+        <p class="hint"><strong>No seu modelo:</strong> fotografe o papel inteiro com as duas grades visíveis, reto, com boa luz e ocupando quase toda a imagem. O app separa automaticamente a cartela da esquerda e a da direita.</p>
       </div>
 
       <div id="cropPanel" class="card-panel hidden">
-        <h3>Ajustar área da grade</h3>
-        <p class="hint">Deixe dentro do retângulo apenas a grade 5×5 com os números.</p>
+        <h3 id="cropTitle">Ajustar o papel completo</h3>
+        <p id="cropHint" class="hint">Deixe dentro do retângulo amarelo o papel inteiro. As duas grades verdes devem ficar em cima dos números.</p>
         <div class="canvas-wrap"><canvas id="previewCanvas"></canvas></div>
         <div class="crop-controls">
           <label>Topo <input id="cropTop" type="range" min="0" max="35" value="8" /></label>
@@ -101,18 +107,12 @@
         <div class="section-title-row">
           <div>
             <h3>Confira os números</h3>
-            <p class="hint">Toque em qualquer número para corrigir.</p>
+            <p class="hint">Agora cada lado é conferido separadamente. Toque em qualquer número para corrigir.</p>
           </div>
-          <span id="validationBadge" class="badge">Verificando...</span>
         </div>
-        <div id="reviewGrid" class="bingo-grid editor"></div>
-        <div id="validationMessages" class="validation-messages"></div>
-        <div class="form-row">
-          <label>Nome da cartela
-            <input id="cardName" type="text" maxlength="40" placeholder="Ex.: Cartela 1" />
-          </label>
-        </div>
-        <button id="saveCardBtn" class="primary big" type="button">Salvar cartela</button>
+        <p id="reviewSummary" class="review-summary"></p>
+        <div id="reviewCards" class="review-cards"></div>
+        <button id="saveCardBtn" class="primary big" type="button">Salvar cartelas</button>
       </div>
     </section>
 

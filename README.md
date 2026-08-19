@@ -1,35 +1,28 @@
-# Visão de Águia – Bingo v0.4
+# Visão de Águia – Bingo v0.5
 
-Aplicativo web instalável (PWA) para fotografar cartelas individualmente, reconhecer os números e marcar automaticamente as pedras digitadas.
+Aplicativo PWA para fotografar cartelas, reconhecer os números e marcar automaticamente as pedras sorteadas.
+
+## Leitura do seu modelo real
+
+A v0.5 foi adaptada para o modelo enviado pelo usuário: **um papel com duas cartelas 5×5**, esquerda e direita, separadas por uma faixa central com logotipo/código.
+
+- Fotografe um papel inteiro por vez.
+- Ajuste o retângulo amarelo ao redor do papel completo.
+- Duas grades verdes mostram exatamente as regiões que serão lidas.
+- O cabeçalho BINGO e a faixa central não entram no OCR.
+- O centro de cada grade é livre/coringa.
+- O app cria duas cartelas independentes (A e B) e permite corrigir qualquer número antes de salvar.
+- A validação usa as faixas oficiais: B 1–15, I 16–30, N 31–45, G 46–60, O 61–75.
+
+Também continua existindo a opção de uma grade 5×5 simples.
 
 ## Formas de batida
 
-- **Modo Prime:** qualquer horizontal, qualquer vertical, as 2 diagonais, 4 cantos ou uma das 4 formas de V.
-- **Adicional opcional do Prime:** quadradinhos de 4 números unidos nos cantos. São exatamente quatro possibilidades: B/I superior = B1, I1, B2, I2; G/O superior = G1, O1, G2, O2; B/I inferior = B4, I4, B5, I5; G/O inferior = G4, O4, G5, O5. Basta completar um desses quadradinhos para bater quando o adicional estiver ligado. O adicional vem desligado.
-- **Modo X:** as duas diagonais completas ao mesmo tempo.
-- **Cartela cheia:** todos os espaços marcados (o centro livre/coringa conta automaticamente quando a cartela usa coringa).
+- **Modo Prime:** horizontal, vertical, 2 diagonais, 4 cantos e 4 formatos de V.
+- **Adicional opcional do Prime:** B/I superior, G/O superior, B/I inferior ou G/O inferior, cada um com 4 números formando um quadradinho 2×2.
+- **Modo X:** as duas diagonais completas.
+- **Cartela cheia:** todos os espaços marcados.
 
-A forma de batida pode ser alterada sem apagar as pedras já digitadas; o app recalcula as cartelas com base no modo atual.
+## Instalação
 
-## Publicar grátis no GitHub Pages
-
-1. Crie um repositório **público** no GitHub, por exemplo `visao-de-aguia-bingo`.
-2. Envie todos os arquivos desta pasta para a raiz do repositório.
-3. No GitHub abra **Settings → Pages**.
-4. Em **Build and deployment**, escolha **Deploy from a branch**.
-5. Selecione a branch `main`, pasta `/ (root)` e clique em **Save**.
-6. Aguarde a URL do GitHub Pages aparecer. Abra essa URL no celular.
-
-O app foi preparado com caminhos relativos, manifest e service worker para funcionar em GitHub Pages.
-
-## Instalar no celular
-
-### Android
-Abra a URL no Chrome e use **Instalar app / Adicionar à tela inicial** quando a opção aparecer.
-
-### iPhone
-Abra a URL no Safari → Compartilhar → **Adicionar à Tela de Início** → **Abrir como App da Web** → Adicionar.
-
-## Observação sobre o OCR
-
-A leitura automática usa Tesseract.js via CDN. Na primeira leitura da cartela é necessário acesso à internet para carregar o OCR. As cartelas e as pedras são armazenadas no próprio aparelho; depois de reconhecidas, a marcação e a conferência de bingo são locais.
+Projeto preparado para GitHub Pages e instalação como PWA no celular.
