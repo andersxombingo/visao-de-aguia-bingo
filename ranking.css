@@ -1,0 +1,48 @@
+/* Visão de Águia v0.8 — lista escalável de cartelas */
+.game-list-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:2px 2px 12px;
+  padding:11px 12px;
+  border:1px solid rgba(148,163,184,.14);
+  border-radius:15px;
+  background:rgba(15,23,42,.62);
+}
+.game-list-toolbar>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.game-list-toolbar strong{font-size:13px;color:#f8fafc}
+.game-list-toolbar small{font-size:10px;color:#94a3b8;line-height:1.3}
+.show-more-cards{
+  flex:0 0 auto;
+  border:1px solid #5b21b6;
+  background:linear-gradient(135deg,#6d28d9,#9333ea);
+  color:#fff;
+  min-height:40px;
+  padding:0 13px;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:900;
+  cursor:pointer;
+}
+.show-more-cards:active{transform:scale(.98)}
+.game-card-head{align-items:flex-start!important}
+.game-card-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:48%}
+.marked-count-pill{
+  padding:6px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:950;
+  color:#bfdbfe;
+  background:#102a52;
+  border:1px solid #245da4;
+  white-space:nowrap;
+}
+/* Ajuda quando houver muitas tábuas cadastradas na página inicial. */
+.saved-card{content-visibility:auto;contain-intrinsic-size:360px}
+@media(max-width:520px){
+  .game-list-toolbar{align-items:stretch;flex-direction:column}
+  .show-more-cards{width:100%}
+  .game-card-badges{max-width:52%}
+  .marked-count-pill,.near-pill,.ok-pill{font-size:9px;padding:5px 7px}
+}
