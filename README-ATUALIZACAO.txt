@@ -1,26 +1,32 @@
-Visão de Águia – Bingo v0.9 PHOTO MODE PATCH
+VISÃO DE ÁGUIA – BINGO v1.0 PRO
+ATUALIZAÇÃO: 90 TÁBUAS / 180 CARTELAS PRONTAS PARA JOGO
 
-Arquivos neste patch:
-- index.html
-- sw.js
-- photo-mode.js
+Arquivos para enviar à RAIZ do repositório:
+- index.html (substituir)
+- photo-mode.js (substituir)
+- sw.js (substituir)
+- seed-data.js (novo)
 
-O que foi adicionado:
-1) Novo modo FOTO na tela da partida.
-2) Modo GRADE continua existindo.
-3) Quando você salva uma tábua nova, o app guarda também uma imagem recortada de cada cartela.
-4) Ao digitar as pedras, as marcações aparecem tanto no modo Grade quanto no modo Foto.
-5) A classificação continua priorizando as cartelas com mais números marcados.
-6) Mostrar mais / mostrar menos.
+IMPORTAÇÃO CONFERIDA
+- 92 fotografias recebidas
+- 90 tábuas únicas importadas
+- 180 cartelas prontas
+- 2 fotografias realmente repetidas foram ignoradas
+- IDs iguais com conteúdos diferentes foram mantidos
 
-Como atualizar:
-- Envie estes 3 arquivos para a raiz do repositório visao-de-aguia-bingo.
-- Substitua os antigos quando o GitHub pedir.
-- Depois do deploy, faça um recarregamento forte:
-  Computador: Ctrl + F5
-  Celular: feche e abra a página novamente.
+NOVO
+- Barra de pesquisa por ID na tela inicial
+- Pesquisa por ID também durante a partida
+- As duas cartelas da mesma tábua ficam juntas, lado a lado
+- Mais marcadas continuam subindo para o topo
+- Mostrar mais continua disponível
+- Modo Grade e modo Foto continuam disponíveis
+- Cartelas já existentes do usuário são preservadas
 
-Importante:
-- As cartelas já salvas continuam existindo.
-- As fotos das cartelas passam a ser salvas a partir das próximas tábuas que você cadastrar com esta atualização.
-- Cartelas antigas podem continuar sem foto, mas seguem funcionando normalmente no modo Grade.
+IMPORTANTE
+A importação dos números foi validada pelas faixas B=1–15, I=16–30, N=31–45,
+G=46–60, O=61–75 e por repetição indevida dentro de cada cartela. Leituras
+que ficaram duvidosas na análise foram revisadas antes de gerar este pacote.
+
+Depois de enviar os arquivos ao GitHub, faça Ctrl+F5 no computador ou feche e
+abra o aplicativo novamente no celular para carregar o novo service worker.

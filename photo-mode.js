@@ -12,6 +12,8 @@
 
   let visibleCount = INITIAL_VISIBLE;
   let rankedItems = [];
+  let rankedGroups = [];
+  let gameSearchQuery = '';
   let currentMode = localStorage.getItem(VIEW_KEY) || 'grid';
 
   const esc = (s) => String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -39,7 +41,14 @@
       .photo-marker.winning{background:rgba(245,158,11,.40);border-color:#fcd34d;box-shadow:0 0 0 4px rgba(245,158,11,.18),0 0 18px rgba(245,158,11,.28)}
       .photo-fallback-note,.photo-legend{font-size:11px;color:#94a3b8;margin-top:10px;line-height:1.4}
       .photo-grid-fallback{margin-top:12px}
-      @media (max-width:560px){.view-toggle{width:100%}.view-toggle button{flex:1}.photo-marker{width:13.2%}}
+      .game-board-pair{border:1px solid #334155;border-radius:18px;padding:10px;background:rgba(15,23,42,.72);display:grid;gap:9px}
+      .game-board-pair-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+      .game-board-pair-head strong{font-size:14px}.game-board-pair-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
+      .game-board-pair-grid .game-card{margin:0;min-width:0}.game-board-pair-grid .game-card-head{gap:4px}.game-board-pair-grid .board-title small{display:none}
+      .game-board-pair-grid .game-card-badges{justify-content:flex-start}.game-board-pair-grid .marked-count-pill{font-size:9px;padding:5px 6px}
+      .game-card-search{display:flex;align-items:center;gap:8px;min-width:min(100%,280px);flex:1;max-width:420px;border:1px solid #334155;border-radius:13px;background:#0b1220;padding:8px 10px}
+      .game-card-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-size:14px;font-weight:800}
+      @media (max-width:560px){.view-toggle{width:100%}.view-toggle button{flex:1}.photo-marker{width:13.2%}.game-board-pair{padding:7px}.game-board-pair-grid{gap:5px}.game-board-pair-grid .game-card{padding:7px}.game-board-pair-grid .bingo-cell{font-size:clamp(9px,2.7vw,13px)}}
     `;
     document.head.appendChild(style);
   }
@@ -143,11 +152,12 @@
     const rightImage = cropCanvas(previewCanvas, rects.right);
     const store = readPhotos();
 
+    const groupKey = 'photo_' + Date.now().toString(36);
     reviewCards.forEach(card => {
       const side = normalizeSide(card.side);
       const image = side === 'esquerda' ? leftImage : rightImage;
       if (!image) return;
-      const item = { boardId, side: card.side, numbers: card.numbers, image, savedAt: Date.now() };
+      const item = { boardId, side: card.side, numbers: card.numbers, image, groupKey, savedAt: Date.now() };
       store[signature(boardId, card.side, card.numbers)] = item;
       store[fallbackKey(boardId, card.side)] = item;
     });
@@ -160,6 +170,8 @@
   function parseGameItems(html){
     const fragments = String(html || '').match(/<article class="game-card[\s\S]*?<\/article>/g) || [];
     const photos = readPhotos();
+    const state = readState();
+    const stateCards = Array.isArray(state.cards) ? state.cards : [];
 
     rankedItems = fragments.map((fragment, idx) => {
       const boardId = (fragment.match(/<span class="id-tag">ID\s+([^<]*)<\/span>/i) || [,'—'])[1].trim();
@@ -192,12 +204,24 @@
       if (!statusHtml) statusHtml = `<span class="near-pill">FALTAM ${remaining}</span>`;
 
       const photo = photos[signature(boardId, side, numbers)] || photos[fallbackKey(boardId, side)] || null;
-      return { fragment, boardId, side, label, numbers, markedIndexes, winningIndexes, markedCount, remaining, statusHtml, photo, idx };
+      const numberSig = numbers.map(Number).join(',');
+      const stateCard = stateCards.find(c => String(c.boardId||'') === (boardId === '—' ? '' : boardId) && normalizeSide(c.side) === normalizeSide(side) && (c.numbers||[]).map(Number).join(',') === numberSig);
+      const groupId = stateCard?.groupId || photo?.groupKey || ('single_' + idx);
+      return { fragment, boardId, side, label, numbers, markedIndexes, winningIndexes, markedCount, remaining, statusHtml, photo, groupId, idx };
     }).sort((a, b) => {
       if (b.markedCount !== a.markedCount) return b.markedCount - a.markedCount;
       if (a.remaining !== b.remaining) return a.remaining - b.remaining;
       return a.idx - b.idx;
     });
+    const map = new Map();
+    rankedItems.forEach(item => {
+      if (!map.has(item.groupId)) map.set(item.groupId, []);
+      map.get(item.groupId).push(item);
+    });
+    rankedGroups = [...map.entries()].map(([groupId, items], order) => {
+      items.sort((a,b) => normalizeSide(a.side)==='esquerda' ? -1 : normalizeSide(b.side)==='esquerda' ? 1 : a.idx-b.idx);
+      return {groupId, items, boardId:items[0]?.boardId||'—', markedCount:Math.max(...items.map(x=>x.markedCount)), remaining:Math.min(...items.map(x=>x.remaining)), order};
+    }).sort((a,b) => b.markedCount-a.markedCount || a.remaining-b.remaining || a.order-b.order);
   }
 
   function renderMarkers(item){
@@ -231,23 +255,33 @@
     return item.fragment.replace(/(<div class="game-card-head">[\s\S]*?<\/div>)(\s*<div class="bingo-grid">)/, `$1${badgeBlock}$2`);
   }
 
+  function renderGroup(group){
+    const id = group.boardId && group.boardId !== '—' ? group.boardId : 'SEM ID';
+    const cards = group.items.map(item => currentMode === 'photo' ? renderPhotoItem(item) : renderGridItem(item)).join('');
+    return `<section class="game-board-pair" data-board-id="${esc(id)}"><div class="game-board-pair-head"><div><span class="id-tag">ID ${esc(id)}</span> <strong>Tábua</strong></div><span class="marked-count-pill">máx. ${group.markedCount} marcados</span></div><div class="game-board-pair-grid">${cards}</div></section>`;
+  }
+
   const nativeDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
   const nativeSet = nativeDescriptor.set;
   const nativeGet = nativeDescriptor.get;
 
   function updateToolbar(){
+    const filtered = rankedGroups.filter(g => !gameSearchQuery || String(g.boardId||'').toLowerCase().includes(gameSearchQuery));
+    const shownGroups = Math.min(Math.ceil(visibleCount/2), filtered.length);
+    const shownCards = filtered.slice(0, shownGroups).reduce((n,g)=>n+g.items.length,0);
     summary.innerHTML = rankedItems.length
-      ? `Mostrando <strong>${Math.min(visibleCount, rankedItems.length)}</strong> de <strong>${rankedItems.length}</strong> cartelas<small>Mais marcadas primeiro. Você pode alternar entre grade e foto a qualquer momento.</small>`
+      ? `Mostrando <strong>${shownCards}</strong> de <strong>${rankedItems.length}</strong> cartelas<small>As duas cartelas da mesma tábua ficam juntas. Mais marcadas primeiro.</small>`
       : 'Nenhuma cartela para mostrar';
 
     btnGrid.classList.toggle('active', currentMode === 'grid');
     btnPhoto.classList.toggle('active', currentMode === 'photo');
 
-    if (rankedItems.length > visibleCount) {
+    const filteredCount = rankedGroups.filter(g => !gameSearchQuery || String(g.boardId||'').toLowerCase().includes(gameSearchQuery)).reduce((n,g)=>n+g.items.length,0);
+    if (filteredCount > visibleCount) {
       moreBtn.classList.remove('hidden');
-      moreBtn.textContent = `Mostrar mais (+${Math.min(LOAD_STEP, rankedItems.length - visibleCount)})`;
+      moreBtn.textContent = `Mostrar mais (+${Math.min(LOAD_STEP, filteredCount - visibleCount)})`;
       moreBtn.dataset.mode = 'more';
-    } else if (rankedItems.length > INITIAL_VISIBLE && visibleCount > INITIAL_VISIBLE) {
+    } else if (filteredCount > INITIAL_VISIBLE && visibleCount > INITIAL_VISIBLE) {
       moreBtn.classList.remove('hidden');
       moreBtn.textContent = 'Mostrar menos';
       moreBtn.dataset.mode = 'less';
@@ -258,11 +292,10 @@
   }
 
   function rerender(){
-    const visible = rankedItems.slice(0, visibleCount);
-    const html = currentMode === 'photo'
-      ? visible.map(renderPhotoItem).join('')
-      : visible.map(renderGridItem).join('');
-    nativeSet.call(gameCards, html);
+    const filtered = rankedGroups.filter(g => !gameSearchQuery || String(g.boardId||'').toLowerCase().includes(gameSearchQuery));
+    const groupLimit = Math.max(1, Math.ceil(visibleCount / 2));
+    const visible = filtered.slice(0, groupLimit);
+    nativeSet.call(gameCards, visible.map(renderGroup).join(''));
     updateToolbar();
   }
 
@@ -287,6 +320,7 @@
     </div>
     <div class="cards-meta">
       <div id="cardsSummary" class="cards-summary">Cartelas prontas</div>
+      <label class="game-card-search">⌕ <input id="gameBoardSearch" inputmode="numeric" placeholder="Buscar ID durante a partida"></label>
     </div>
   `;
   gameCards.parentNode.insertBefore(toolbar, gameCards);
@@ -295,6 +329,8 @@
   const btnPhoto = document.getElementById('cardsPhotoModeBtn');
   const moreBtn = document.getElementById('showMoreCardsBtn');
   const summary = document.getElementById('cardsSummary');
+  const gameSearch = document.getElementById('gameBoardSearch');
+  gameSearch.addEventListener('input', () => { gameSearchQuery = gameSearch.value.trim().toLowerCase(); visibleCount = INITIAL_VISIBLE; rerender(); });
 
   btnGrid.addEventListener('click', () => { currentMode = 'grid'; saveView(currentMode); rerender(); });
   btnPhoto.addEventListener('click', () => { currentMode = 'photo'; saveView(currentMode); rerender(); });
